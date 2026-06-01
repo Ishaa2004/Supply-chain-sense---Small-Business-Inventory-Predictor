@@ -21,10 +21,7 @@ st.set_page_config(
 st.title("⚡ AI-Driven Real-Time Supply Chain Optimization Engine")
 st.markdown("Generative Risk Assessment & Statistical Inventory Overrides")
 st.markdown(
-    "This system translates unstructured global disruption reports into operational metrics. "
-    "It uses **Gemini 2.5 Flash** for real-time contextual evaluation and injects modifiers "
-    "directly into probability-based safety stock and reorder point distributions."
-)
+    "This system translates unstructured global disruption reports into operational metrics. ")
 st.divider()
 
 # ==========================================
