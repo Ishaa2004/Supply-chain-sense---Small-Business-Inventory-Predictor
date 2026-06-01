@@ -242,8 +242,8 @@ if user_news_input.strip() != "":
     except Exception as e:
         print(f"Execution Crash: {e}")
 
-!pip install streamlit google-genai pandas numpy scipy
-!npm install -g localtunnel
+# !pip install streamlit google-genai pandas numpy scipy
+# !npm install -g localtunnel
 
 import os
 import json
