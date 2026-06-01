@@ -72,7 +72,7 @@ df_baseline_matrix = pd.DataFrame(calculated_inventory_baselines)
 df_baseline_matrix.to_csv('supermarket_phase1_baseline.csv', index=False)
 print(df_baseline_matrix.to_string(index=False))
 
-pip install google-genai pandas numpy scipy
+# pip install google-genai pandas numpy scipy
 
 import os
 import json
