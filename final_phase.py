@@ -26,7 +26,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-st.title("📦 SupplyChainSense")
+st.title("📦 Supply Chain Sense")
 st.subheader("Small Business Inventory Predictor & AI Risk Engine")
 st.markdown(
     "An intelligent supply chain optimization suite. SupplyChainSense dynamically accepts "
