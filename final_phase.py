@@ -144,7 +144,6 @@ if "GEMINI_API_KEY" in st.secrets:
         client = genai.Client()
     except Exception as e:
         st.error(f"Failed to initialize Gemini Client: {e}")
-        st.stop()
 else:
     st.error("**Security Token Missing!** Please add your `GEMINI_API_KEY` to your Streamlit Advanced Secrets panel.")
     st.stop()
