@@ -111,15 +111,23 @@ def process_raw_transaction_log(df_raw):
     mean_demand = daily_matrix.mean().to_dict()
     std_demand = daily_matrix.std().to_dict()
 
-    # 5. Compile into an inventory baseline matrix using standardized business defaults
+# 5. Compile into an inventory baseline matrix using standardized business defaults
     STANDARD_LEAD_TIME = 2
-    DEFAULT_SERVICE_LEVEL = 0.95  # 95% target protection level
-    z_baseline = norm.ppf(DEFAULT_SERVICE_LEVEL)
 
     compiled_rows = []
     for category in daily_matrix.columns:
         mu = mean_demand[category]
         sigma = np.nan_to_num(std_demand[category], nan=0.0) # Handle edge cases with zero variance safely
+
+        # Differentiated service levels matching operational design
+        if any(f_word in category.lower() for f_word in ['food', 'beverage', 'grocery', 'fresh', 'eat']):
+            service_level = 0.99
+            service_label = "99%"
+        else:
+            service_level = 0.85
+            service_label = "85%"
+            
+        z_baseline = norm.ppf(service_level)
 
         # Calculate classical Safety Stock and Baseline Reorder Points
         safety_stock = z_baseline * sigma * np.sqrt(STANDARD_LEAD_TIME)
@@ -129,7 +137,7 @@ def process_raw_transaction_log(df_raw):
             'Department': category,
             'Avg Daily Sales': round(mu, 2),
             'Sales Volatility': round(sigma, 2),
-            'Target Service Level': "95%",
+            'Target Service Level': service_label,
             'Reorder Point': round(reorder_point, 2)
         })
 
@@ -204,13 +212,15 @@ with col_box:
 # Load and identify matrix formats dynamically
 if uploaded_file is not None:
     df_raw_input = pd.read_csv(uploaded_file)
-elif run_demo_flag or (uploaded_file is None and os.path.exists(DEFAULT_BACKUP)):
+elif run_demo_flag:
     df_raw_input = pd.read_csv(DEFAULT_BACKUP)
     st.caption("Running in Demo Mode using raw historical transaction invoice logs.")
+else:
+    st.stop()
 
 # DETECT SCHEMA & RUN AUTOMATIC PIPELINES
 summary_columns = ['Avg Daily Sales', 'Sales Volatility', 'Reorder Point']
-is_precalculated = all(col in df_raw_input.columns for col in ['Department'] + summary_columns or [c in df_raw_input.columns for c in ['Product line']])
+is_precalculated = all(col in df_raw_input.columns for col in ['Department'] + summary_columns)
 
 if 'Department' not in df_raw_input.columns and 'Product line' in df_raw_input.columns:
     df_raw_input = df_raw_input.rename(columns={'Product line': 'Department'})
@@ -260,6 +270,7 @@ if st.button("Execute Optimization Models", type="primary", use_container_width=
 
         risk_payload = None
         current_categories = df_baseline['Department'].unique().tolist()
+        example_cat = current_categories[0] if current_categories else "Category"
 
         try:
             baseline_summary_string = df_baseline[['Department', 'Avg Daily Sales', 'Reorder Point']].to_string(index=False)
@@ -285,7 +296,7 @@ if st.button("Execute Optimization Models", type="primary", use_container_width=
             {{
               "disruption_summary": "One clear analytical sentence evaluating the core threat",
               "department_adjustments": {{
-                 "{current_categories[0]}": {{ "Demand_Shock_Factor": 1.00, "Lead_Time_Delay_Days": 0 }}
+                 "{example_cat}": {{ "Demand_Shock_Factor": 1.00, "Lead_Time_Delay_Days": 0 }}
               }}
             }}
             """
@@ -326,6 +337,7 @@ if st.button("Execute Optimization Models", type="primary", use_container_width=
                 # Parse percent levels robustly (e.g. "95%" or 0.95)
                 raw_level = str(row['Target Service Level']).replace('%', '').strip()
                 service_probability = float(raw_level) / 100.0 if float(raw_level) > 1.0 else float(raw_level)
+                service_probability = min(max(service_probability, 0.01), 0.9999)
                 z_value = norm.ppf(service_probability)
 
                 # Fetch modifiers safely
