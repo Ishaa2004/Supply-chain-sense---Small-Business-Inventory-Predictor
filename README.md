@@ -28,7 +28,6 @@ The application is built using open-source Python data science frameworks:
 
 Organize your GitHub repository using this streamlined layout:
 
-```text
 📁 supply-chain-sense/
 │
 ├── 📄 app.py                         # Core interactive Streamlit application entry point
