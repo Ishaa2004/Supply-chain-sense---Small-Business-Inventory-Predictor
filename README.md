@@ -40,7 +40,7 @@ Organize your GitHub repository using this streamlined layout:
 The Target Service Level represents the mathematical probability that a business will successfully fulfill customer orders without experiencing a stockout during a single replenishment cycle.
 To convert this percentage into an active warehouse cushion, the code maps it onto a standard normal distribution curve using the Inverse Cumulative Distribution Function (also known as the Percent Point Function or Z-score function):
 
-**z=ϕ^(-1) (SL)**
+**z=ϕ^(-1) _(SL)_**
 In the Python backend, this is handled natively via:
 **z_score = norm.ppf(target_service_level)**
 
@@ -53,7 +53,7 @@ The engine derives the Daily Holding Cost _(H)_ per item using the following cal
 **The Dynamic Recalculation Math**
 When an emergency alert is passed to the engine, the system overrides the steady-state baseline vectors and computes a new distribution matrix instantly:
 
-**〖Lead Time 〗_adjusted= 〖Lead Time 〗_(normal )+〖Delay〗_AI**
+**_〖Lead Time 〗_adjusted_= 〖Lead Time 〗_(normal )+〖Delay〗_AI**
 
 **〖SS〗_(adjusted )=z ×(σ × 〖Shock〗_AI )×√(〖Lead Time〗_adjusted  )**
 
